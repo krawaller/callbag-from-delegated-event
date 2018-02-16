@@ -1,0 +1,27 @@
+{
+  "name": "callbag-from-delegated-event",
+  "version": "1.0.0",
+  "description": "Create a callbag listenable source from selector-filtered events on a DOM node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krawaller/callbag-from-delegated-event.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test.js"
+  },
+  "author": "David Waller",
+  "license": "MIT",
+  "keywords": [
+    "callbag"
+  ],
+  "devDependencies": {
+    "callbag-map": "^1.0.1",
+    "jsdom": "^11.6.2",
+    "tape": "^4.8.0"
+  },
+  "dependencies": {
+    "callbag-filter": "^1.0.0",
+    "callbag-from-event": "^1.0.0"
+  }
+}
