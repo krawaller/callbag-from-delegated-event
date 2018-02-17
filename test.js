@@ -1,6 +1,7 @@
 const test = require('tape');
 const fromDelegatedEvent = require('./index');
 const map = require('callbag-map');
+const makeMockCallbag = require('callbag-mock');
 
 const jsdom = require('jsdom').JSDOM;
 
@@ -38,7 +39,7 @@ test('it sets up delegated events', t => {
   fire(pawn, 'click', 'pawnClickCaptured');
 
   t.deepEqual(history, [
-    ['sink', 'fromUp', 1, 'pawnClickCaptured'],
+    ['sink', 'body', 1, 'pawnClickCaptured'],
   ], 'sources gets evts that match type and selector');
 
   t.end();
@@ -70,23 +71,3 @@ test('it cleans up listeners on termination', t => {
 
   t.end();
 });
-
-function makeMockCallbag(name, report=()=>{}, isSource) {
-  if (report === true) {
-    isSource = true;
-    report = ()=>{};
-  }
-  let talkback;
-  let mock = (t, d) => {
-    report(name, 'fromUp', t, d);
-    if (t === 0){
-      talkback = d;
-      if (isSource) talkback(0, (st, sd) => report(name, 'fromDown', st, sd));
-    }
-  };
-  mock.emit = (t, d) => {
-    if (!talkback) throw new Error(`Can't emit from ${name} before anyone has connected`);
-    talkback(t, d);
-  };
-  return mock;
-}
