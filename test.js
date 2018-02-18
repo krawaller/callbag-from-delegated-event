@@ -49,6 +49,7 @@ test('it catches matching el between target and root', tape => {
   const dom = new jsdom(`
     <div class="board">
       <div class="pawn"><div class="body"></div></div>
+      <div class="bishop"></div>
     </div>
   `);
 
@@ -56,6 +57,7 @@ test('it catches matching el between target and root', tape => {
   const board = doc.querySelector('.board');
   const pawn = doc.querySelector('.pawn');
   const body = doc.querySelector('.body');
+  const bishop = doc.querySelector('.bishop');
 
   const source = fromDelegatedEvent(board, '.pawn', 'click', true);
   const sink = makeMockCallbag('sink', (name,dir,t,d) => {
@@ -67,6 +69,8 @@ test('it catches matching el between target and root', tape => {
   source(0, sink);
 
   fire(dom, body, 'click', 'bodyClickCaptured');
+  fire(dom, bishop, 'click', 'siblingClickNotCaptured');
+  fire(dom, board, 'click', 'rootClickNotCaptured');
 
   tape.plan(1);
   tape.end();

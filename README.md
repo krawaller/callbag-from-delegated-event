@@ -11,7 +11,7 @@ Create a [callbag](https://github.com/callbag/callbag) listenable source from ev
 (root: DOMelement, selector: string, eventName: string, between?: boolean) => source
 ```
 
-If `between` is true you'll also receive events where an element between the target and the root matches the selector (this includes the root). The matched element will be available on the `.matchedElement` prop on the event object.
+If `between` is true you'll also receive events where an element between the target and the root matches the selector. The matched element will be available on the `.matchedElement` prop on the event object.
 
 
 ## example
