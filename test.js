@@ -1,14 +1,16 @@
 const test = require('tape');
 const fromDelegatedEvent = require('./index');
-const map = require('callbag-map');
 const makeMockCallbag = require('callbag-mock');
 
 const jsdom = require('jsdom').JSDOM;
 
-test('it sets up delegated events', t => {
+const fire = (dom, node, evt, desc) => {
+  let event = new dom.window.MouseEvent(evt, {bubbles: true, relatedTarget: node});
+  event.desc = desc;
+  node.dispatchEvent(event);
+}
 
-  let history = [];
-  const report = (name,dir,t,d) => t !== 0 && history.push([name,dir,t,d]);
+test('it sets up delegated events', tape => {
 
   const dom = new jsdom(`
     <div class="board">
@@ -17,35 +19,60 @@ test('it sets up delegated events', t => {
     </div>
   `);
 
-  const fire = (node, evt, desc) => {
-    event = new dom.window.MouseEvent(evt, {bubbles: true, relatedTarget: node});
-    event.desc = desc;
-    node.dispatchEvent(event);
-  }
-
   const doc = dom.window.document;
   const board = doc.querySelector('.board');
   const pawn = doc.querySelector('.pawn');
   const bishop = doc.querySelector('.bishop');
 
   const source = fromDelegatedEvent(board, '.pawn', 'click');
-  const sink = makeMockCallbag('sink', report);
+  const sink = makeMockCallbag('sink', (name,dir,t,d) => {
+    if (t === 1){
+      tape.equal(d.target, pawn);
+      tape.equal(d.desc, 'pawnClickCaptured');
+    }
+  });
 
-  map(e => e.desc)(source)(0, sink);
+  source(0, sink);
 
-  fire(bishop, 'click', 'siblingEventNotCaptured');
-  fire(board, 'click', 'rootEventNotCaptured');
-  fire(pawn, 'hover', 'wrongTypeNotCaptured');
-  fire(pawn, 'click', 'pawnClickCaptured');
+  fire(dom, bishop, 'click', 'siblingEventNotCaptured');
+  fire(dom, board, 'click', 'rootEventNotCaptured');
+  fire(dom, pawn, 'hover', 'wrongTypeNotCaptured');
+  fire(dom, pawn, 'click', 'pawnClickCaptured');
 
-  t.deepEqual(history, [
-    ['sink', 'body', 1, 'pawnClickCaptured'],
-  ], 'sources gets evts that match type and selector');
-
-  t.end();
+  tape.plan(2);
+  tape.end();
 });
 
-test('it cleans up listeners on termination', t => {
+test('it catches matching el between target and root', tape => {
+  let history = [];
+
+  const dom = new jsdom(`
+    <div class="board">
+      <div class="pawn"><div class="body"></div></div>
+    </div>
+  `);
+
+  const doc = dom.window.document;
+  const board = doc.querySelector('.board');
+  const pawn = doc.querySelector('.pawn');
+  const body = doc.querySelector('.body');
+
+  const source = fromDelegatedEvent(board, '.pawn', 'click', true);
+  const sink = makeMockCallbag('sink', (name,dir,t,d) => {
+    if (t === 1){
+      tape.equal( d.matchedElement, pawn );
+    }
+  });
+
+  source(0, sink);
+
+  fire(dom, body, 'click', 'bodyClickCaptured');
+
+  tape.plan(1);
+  tape.end();
+});
+
+test('it cleans up listeners on termination', tape => {
   let history = [];
   let listener;
 
@@ -64,10 +91,10 @@ test('it cleans up listeners on termination', t => {
   fromDelegatedEvent(fakeNode, '.whatev', 'someEvt')(0, sink);
   sink.emit(2);
 
-  t.deepEqual(history, [
+  tape.deepEqual(history, [
     ['added listener', 'someEvt'],
     ['removed listener', 'someEvt', true],
   ], 'cleaned up handlers after termination');
 
-  t.end();
+  tape.end();
 });

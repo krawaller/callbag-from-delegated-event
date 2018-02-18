@@ -16,7 +16,6 @@
     "callbag"
   ],
   "devDependencies": {
-    "callbag-map": "^1.0.1",
     "callbag-mock": "^1.0.0",
     "jsdom": "^11.6.2",
     "tape": "^4.8.0"
