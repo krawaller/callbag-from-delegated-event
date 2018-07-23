@@ -1,5 +1,5 @@
 const test = require('tape');
-const fromDelegatedEvent = require('./index');
+const fromDelegatedEvent = require('.');
 const makeMockCallbag = require('callbag-mock');
 
 const jsdom = require('jsdom').JSDOM;

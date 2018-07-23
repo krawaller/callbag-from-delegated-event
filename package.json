@@ -6,9 +6,13 @@
     "type": "git",
     "url": "git+https://github.com/krawaller/callbag-from-delegated-event.git"
   },
-  "main": "index.js",
+  "main": "index.cjs.js",
+  "module": "index.js",
   "scripts": {
-    "test": "tape test.js"
+    "build": "rollup $npm_package_module -o $npm_package_main --f cjs --external callbag-filter,callbag-from-event",
+    "pretest": "npm run build",
+    "test": "tape test.js",
+    "prepare": "npm test"
   },
   "author": "David Waller",
   "license": "MIT",
@@ -18,6 +22,7 @@
   "devDependencies": {
     "callbag-mock": "^1.0.0",
     "jsdom": "^11.6.2",
+    "rollup": "^0.63.4",
     "tape": "^4.8.0"
   },
   "dependencies": {

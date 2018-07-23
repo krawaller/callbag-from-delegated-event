@@ -1,5 +1,5 @@
-const fromEvent = require("callbag-from-event");
-const filter = require("callbag-filter");
+import fromEvent from "callbag-from-event";
+import filter from "callbag-filter";
 
 const fromDelegatedEvent = (root, sel, evt, between) => filter(e => {
   if (between){
@@ -15,4 +15,4 @@ const fromDelegatedEvent = (root, sel, evt, between) => filter(e => {
   } else return e.target.matches(sel);
 })(fromEvent(root, evt));
 
-module.exports = fromDelegatedEvent;
+export default fromDelegatedEvent;
