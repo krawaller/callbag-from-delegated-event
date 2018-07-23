@@ -1,6 +1,6 @@
 # callbag-from-delegated-event
 
-Create a [callbag](https://github.com/callbag/callbag) listenable source from events on a DOM node. The events are filtered to those where the target element matches the given selector.
+Create a [callbag](https://github.com/callbag/callbag) listenable source from events on a DOM node. The events are filtered to those where the target element matches the given selector, or is a child of an element that matches it.
 
 
 `npm install callbag-from-delegated-event`
@@ -8,11 +8,8 @@ Create a [callbag](https://github.com/callbag/callbag) listenable source from ev
 ## signature
 
 ```
-(root: DOMelement, selector: string, eventName: string, between?: boolean) => source
+(root: DOMelement, selector: string, eventName: string) => source
 ```
-
-If `between` is true you'll also receive events where an element between the target and the root matches the selector. The matched element will be available on the `.matchedElement` prop on the event object.
-
 
 ## example
 

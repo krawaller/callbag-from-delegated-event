@@ -1,18 +1,15 @@
 import fromEvent from "callbag-from-event";
 import filter from "callbag-filter";
 
-const fromDelegatedEvent = (root, sel, evt, between) => filter(e => {
-  if (between){
-    let at = e.target;
-    while(at !== root){
-      if (at.matches(sel)) {
-        e.matchedElement = at;
-        return true;
-      }
-      at = at.parentElement;
+const fromDelegatedEvent = (root, sel, evt) => filter(e => {
+  let at = e.target;
+  while(at !== root){
+    if (at.matches(sel)) {
+      return true;
     }
-    return false;
-  } else return e.target.matches(sel);
+    at = at.parentElement;
+  }
+  return false;
 })(fromEvent(root, evt));
 
 export default fromDelegatedEvent;

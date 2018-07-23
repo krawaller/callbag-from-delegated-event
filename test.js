@@ -14,7 +14,7 @@ test('it sets up delegated events', tape => {
 
   const dom = new jsdom(`
     <div class="board">
-      <div class="pawn"></div>
+      <div class="pawn"><div class="child"></div></div>
       <div class="bishop"></div>
     </div>
   `);
@@ -22,15 +22,11 @@ test('it sets up delegated events', tape => {
   const doc = dom.window.document;
   const board = doc.querySelector('.board');
   const pawn = doc.querySelector('.pawn');
+  const pawnChild = doc.querySelector('.child');
   const bishop = doc.querySelector('.bishop');
 
   const source = fromDelegatedEvent(board, '.pawn', 'click');
-  const sink = makeMockCallbag('sink', (name,dir,t,d) => {
-    if (t === 1){
-      tape.equal(d.target, pawn);
-      tape.equal(d.desc, 'pawnClickCaptured');
-    }
-  });
+  const sink = makeMockCallbag();
 
   source(0, sink);
 
@@ -38,41 +34,13 @@ test('it sets up delegated events', tape => {
   fire(dom, board, 'click', 'rootEventNotCaptured');
   fire(dom, pawn, 'hover', 'wrongTypeNotCaptured');
   fire(dom, pawn, 'click', 'pawnClickCaptured');
+  fire(dom, pawnChild, 'click', 'pawnChildClickCaptured');
 
-  tape.plan(2);
-  tape.end();
-});
+  const capturedEvents = sink.getReceivedData();
+  tape.equal(capturedEvents.length, 2);
+  tape.equal(capturedEvents[0].desc, 'pawnClickCaptured');
+  tape.equal(capturedEvents[1].desc, 'pawnChildClickCaptured');
 
-test('it catches matching el between target and root', tape => {
-  let history = [];
-
-  const dom = new jsdom(`
-    <div class="board">
-      <div class="pawn"><div class="body"></div></div>
-      <div class="bishop"></div>
-    </div>
-  `);
-
-  const doc = dom.window.document;
-  const board = doc.querySelector('.board');
-  const pawn = doc.querySelector('.pawn');
-  const body = doc.querySelector('.body');
-  const bishop = doc.querySelector('.bishop');
-
-  const source = fromDelegatedEvent(board, '.pawn', 'click', true);
-  const sink = makeMockCallbag('sink', (name,dir,t,d) => {
-    if (t === 1){
-      tape.equal( d.matchedElement, pawn );
-    }
-  });
-
-  source(0, sink);
-
-  fire(dom, body, 'click', 'bodyClickCaptured');
-  fire(dom, bishop, 'click', 'siblingClickNotCaptured');
-  fire(dom, board, 'click', 'rootClickNotCaptured');
-
-  tape.plan(1);
   tape.end();
 });
 
@@ -90,7 +58,7 @@ test('it cleans up listeners on termination', tape => {
     }
   }
 
-  const sink = makeMockCallbag('sink');
+  const sink = makeMockCallbag();
 
   fromDelegatedEvent(fakeNode, '.whatev', 'someEvt')(0, sink);
   sink.emit(2);
