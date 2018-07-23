@@ -17,7 +17,7 @@ Create a listenable source of click events on `.pawn` elements in a surrounding 
 
 ```js
 const fromEvent = require('callbag-from-delegated-event');
-const forEach = require('callbag-forEach');
+const forEach = require('callbag-for-each');
 
 const pawnClicks = fromEvent(gameBoard, '.pawn', 'click');
 
